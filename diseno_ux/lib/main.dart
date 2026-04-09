@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'app_palette.dart';
+import 'core/api_client.dart';
+import 'services/auth_service.dart';
 import 'views/activity_view.dart';
+import 'views/auth_view.dart';
 import 'views/home_view.dart';
 import 'views/profile_view.dart';
 import 'views/projects_view.dart';
@@ -31,6 +34,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'GreenPulse UX',
       debugShowCheckedModeBanner: false,
+      navigatorKey: _navigatorKey,
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: colorScheme,
@@ -50,7 +54,52 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const HomePage(),
+      routes: {
+        '/login': (_) => const AuthScreen(),
+        '/home': (_) => const HomePage(),
+      },
+      home: const _AuthGate(),
+    );
+  }
+}
+
+final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+
+class _AuthGate extends StatefulWidget {
+  const _AuthGate();
+
+  @override
+  State<_AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<_AuthGate> {
+  final _authService = AuthService();
+  late Future<bool> _sessionFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    ApiClient.navigatorKey = _navigatorKey;
+    _sessionFuture = _authService.isLoggedIn();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<bool>(
+      future: _sessionFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (snapshot.data == true) {
+          return const HomePage();
+        }
+
+        return const AuthScreen();
+      },
     );
   }
 }

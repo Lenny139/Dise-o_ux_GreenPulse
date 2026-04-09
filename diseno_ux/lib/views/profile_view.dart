@@ -1,12 +1,71 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../app_palette.dart';
+import '../services/auth_service.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final _authService = AuthService();
+  String _nombre = 'Usuario';
+  String _correo = '-';
+  bool _loading = true;
+  bool _loggingOut = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPerfil();
+  }
+
+  Future<void> _loadPerfil() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (!mounted) return;
+      setState(() {
+        _nombre = prefs.getString('usuario_nombre') ?? 'Usuario';
+        _correo = prefs.getString('usuario_correo') ?? '-';
+      });
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(error.toString())));
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _cerrarSesion() async {
+    setState(() => _loggingOut = true);
+    try {
+      await _authService.logout();
+      if (!mounted) return;
+      Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(error.toString().replaceFirst('Exception: ', '')),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _loggingOut = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
       children: [
@@ -34,12 +93,12 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 14),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Lenny Rincón',
+                        _nombre,
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
                           color: AppPalette.textPrimary,
@@ -47,7 +106,7 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 2),
                       Text(
-                        'lenny@greenpulse.app',
+                        _correo,
                         style: TextStyle(color: AppPalette.textSecondary),
                       ),
                       SizedBox(height: 2),
@@ -98,9 +157,15 @@ class ProfileScreen extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         OutlinedButton.icon(
-          onPressed: () {},
+          onPressed: _loggingOut ? null : _cerrarSesion,
           icon: const Icon(Icons.logout_rounded),
-          label: const Text('Cerrar sesión'),
+          label: _loggingOut
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Text('Cerrar sesión'),
         ),
       ],
     );
