@@ -18,18 +18,17 @@ Future<Response> listarProyectos(Request request) async {
     final results = await connection.query(
       '''
       SELECT
-        f.finca_id,
-        f.nombre,
-        f.ubicacion_descripcion,
-        f.latitud,
-        f.longitud,
-        f.fecha_creacion,
-        COALESCE(SUM(CASE WHEN l.activo = 1 THEN 1 ELSE 0 END), 0) AS total_lotes
-      FROM FINCA f
-      LEFT JOIN LOTE l ON l.finca_id = f.finca_id
+        l.lote_id,
+        l.nombre,
+        l.tipo_cultivo,
+        l.area_m2,
+        l.qr_codigo,
+        l.activo,
+        f.fecha_creacion
+      FROM LOTE l
+      INNER JOIN FINCA f ON f.finca_id = l.finca_id
       WHERE f.usuario_id = ?
-      GROUP BY f.finca_id, f.nombre, f.ubicacion_descripcion, f.latitud, f.longitud, f.fecha_creacion
-      ORDER BY f.fecha_creacion DESC
+      ORDER BY l.activo DESC, f.fecha_creacion DESC, l.lote_id DESC
       ''',
       [usuarioId],
     );
@@ -37,13 +36,13 @@ Future<Response> listarProyectos(Request request) async {
     final proyectos = results
         .map(
           (row) => {
-            'finca_id': _toInt(row['finca_id']),
+            'lote_id': _toInt(row['lote_id']),
             'nombre': row['nombre'],
-            'ubicacion_descripcion': row['ubicacion_descripcion'],
-            'latitud': _toDouble(row['latitud']),
-            'longitud': _toDouble(row['longitud']),
+            'tipo_cultivo': row['tipo_cultivo'],
+            'area_m2': _toDouble(row['area_m2']),
+            'qr_codigo': row['qr_codigo'],
+            'activo': _toInt(row['activo']) ?? 1,
             'fecha_creacion': _toIsoString(row['fecha_creacion']),
-            'total_lotes': _toInt(row['total_lotes']) ?? 0,
           },
         )
         .toList();
