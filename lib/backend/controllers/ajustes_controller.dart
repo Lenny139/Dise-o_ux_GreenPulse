@@ -229,6 +229,7 @@ int _usuarioIdDesdeRequest(Request request) {
 bool? _toBool(dynamic value) {
   if (value == null) return null;
   if (value is bool) return value;
+  if (value is num) return value != 0;
   final text = value.toString().toLowerCase().trim();
   if (text == 'true' || text == '1') return true;
   if (text == 'false' || text == '0') return false;
@@ -237,7 +238,9 @@ bool? _toBool(dynamic value) {
 
 int? _toInt(dynamic value) {
   if (value == null) return null;
+  if (value is bool) return value ? 1 : 0;
   if (value is int) return value;
+  if (value is num) return value.toInt();
   if (value is BigInt) return value.toInt();
   return int.tryParse(value.toString());
 }

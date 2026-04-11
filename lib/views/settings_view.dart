@@ -29,14 +29,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _loadAjustes();
   }
 
+  bool _asBool(dynamic value, {required bool fallback}) {
+    if (value is bool) return value;
+    final normalized = value?.toString().trim().toLowerCase();
+    if (normalized == '1' || normalized == 'true') return true;
+    if (normalized == '0' || normalized == 'false') return false;
+    return fallback;
+  }
+
   Future<void> _loadAjustes() async {
     setState(() => _loading = true);
     try {
       final data = await _service.getAjustes();
       if (!mounted) return;
       setState(() {
-        _notificacionesActivas = data['notificaciones_activas'] == true;
-        _sonidosActivos = data['sonidos_activos'] == true;
+        _notificacionesActivas = _asBool(
+          data['notificaciones_activas'],
+          fallback: true,
+        );
+        _sonidosActivos = _asBool(data['sonidos_activos'], fallback: false);
         _idioma = (data['idioma'] ?? 'Español').toString();
         _tema = (data['tema'] ?? 'Claro (GreenPulse)').toString();
         _privacidadModo = (data['privacidad_modo'] ?? 'Estándar').toString();
@@ -54,29 +65,57 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  Future<void> _guardarParcial(Map<String, dynamic> payload) async {
-    if (_saving) return;
+  Future<bool> _guardarParcial(Map<String, dynamic> payload) async {
+    if (_saving) return false;
     setState(() => _saving = true);
     try {
       final data = await _service.updateAjustes(payload);
-      if (!mounted) return;
+      if (!mounted) return false;
       setState(() {
-        _notificacionesActivas = data['notificaciones_activas'] == true;
-        _sonidosActivos = data['sonidos_activos'] == true;
+        _notificacionesActivas = _asBool(
+          data['notificaciones_activas'],
+          fallback: _notificacionesActivas,
+        );
+        _sonidosActivos = _asBool(
+          data['sonidos_activos'],
+          fallback: _sonidosActivos,
+        );
         _idioma = (data['idioma'] ?? 'Español').toString();
         _tema = (data['tema'] ?? 'Claro (GreenPulse)').toString();
         _privacidadModo = (data['privacidad_modo'] ?? 'Estándar').toString();
       });
       AppThemeController.applyThemeLabel(_tema);
+      return true;
     } catch (error) {
-      if (!mounted) return;
+      if (!mounted) return false;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(error.toString().replaceFirst('Exception: ', '')),
         ),
       );
+      return false;
     } finally {
       if (mounted) setState(() => _saving = false);
+    }
+  }
+
+  Future<void> _toggleNotificaciones(bool value) async {
+    if (_saving || value == _notificacionesActivas) return;
+    final previous = _notificacionesActivas;
+    setState(() => _notificacionesActivas = value);
+    final saved = await _guardarParcial({'notificaciones_activas': value});
+    if (!saved && mounted) {
+      setState(() => _notificacionesActivas = previous);
+    }
+  }
+
+  Future<void> _toggleSonidos(bool value) async {
+    if (_saving || value == _sonidosActivos) return;
+    final previous = _sonidosActivos;
+    setState(() => _sonidosActivos = value);
+    final saved = await _guardarParcial({'sonidos_activos': value});
+    if (!saved && mounted) {
+      setState(() => _sonidosActivos = previous);
     }
   }
 
@@ -185,9 +224,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: 'Notificaciones',
                 subtitle: 'Alertas de riego y eventos',
                 value: _notificacionesActivas,
-                onChanged: (value) => _guardarParcial({
-                  'notificaciones_activas': value,
-                }),
+                onChanged: _saving ? null : _toggleNotificaciones,
               ),
               const Divider(height: 1),
               _SettingSwitchTile(
@@ -195,7 +232,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: 'Sonidos',
                 subtitle: 'Avisos de actividad y alertas',
                 value: _sonidosActivos,
-                onChanged: (value) => _guardarParcial({'sonidos_activos': value}),
+                onChanged: _saving ? null : _toggleSonidos,
               ),
             ],
           ),
@@ -251,7 +288,7 @@ class _SettingSwitchTile extends StatelessWidget {
   final String title;
   final String subtitle;
   final bool value;
-  final ValueChanged<bool> onChanged;
+  final ValueChanged<bool>? onChanged;
 
   @override
   Widget build(BuildContext context) {
