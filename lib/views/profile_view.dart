@@ -219,12 +219,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
       children: [
-        const Text(
+        Text(
           'Perfil',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: AppPalette.textPrimary,
+            color: AppPalette.textPrimaryOf(context),
           ),
         ),
         const SizedBox(height: 12),
@@ -233,10 +233,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                const CircleAvatar(
+                CircleAvatar(
                   radius: 30,
-                  backgroundColor: Color(0xFFEAF6F0),
-                  child: Icon(
+                  backgroundColor: AppPalette.softSurfaceOf(context),
+                  child: const Icon(
                     Icons.person_rounded,
                     size: 34,
                     color: AppPalette.primary,
@@ -251,18 +251,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _nombre,
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
-                          color: AppPalette.textPrimary,
+                          color: AppPalette.textPrimaryOf(context),
                         ),
                       ),
                       SizedBox(height: 2),
                       Text(
                         _correo,
-                        style: TextStyle(color: AppPalette.textSecondary),
+                        style: TextStyle(
+                          color: AppPalette.textSecondaryOf(context),
+                        ),
                       ),
                       SizedBox(height: 2),
                       Text(
                         'Productor',
-                        style: TextStyle(color: AppPalette.textSecondary),
+                        style: TextStyle(
+                          color: AppPalette.textSecondaryOf(context),
+                        ),
                       ),
                     ],
                   ),
@@ -276,12 +280,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         const SizedBox(height: 14),
-        const Text(
+        Text(
           'Cuenta',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
-            color: AppPalette.textPrimary,
+            color: AppPalette.textPrimaryOf(context),
           ),
         ),
         const SizedBox(height: 10),
@@ -353,7 +357,7 @@ class _ProfileActionTile extends StatelessWidget {
     return Card(
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: const Color(0xFFEAF6F0),
+          backgroundColor: AppPalette.softSurfaceOf(context),
           child: Icon(icon, color: AppPalette.primary),
         ),
         title: Text(title),

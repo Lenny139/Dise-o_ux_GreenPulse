@@ -79,12 +79,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ? const Center(child: CircularProgressIndicator())
             : _alertas.isEmpty
             ? ListView(
-                children: const [
-                  SizedBox(height: 120),
+                children: [
+                  const SizedBox(height: 120),
                   Center(
                     child: Text(
                       'No tienes alertas pendientes.',
-                      style: TextStyle(color: AppPalette.textSecondary),
+                      style: TextStyle(
+                        color: AppPalette.textSecondaryOf(context),
+                      ),
                     ),
                   ),
                 ],

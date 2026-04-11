@@ -174,18 +174,18 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
       children: [
-        const Text(
+        Text(
           'Proyectos',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: AppPalette.textPrimary,
+            color: AppPalette.textPrimaryOf(context),
           ),
         ),
         const SizedBox(height: 6),
-        const Text(
+        Text(
           'Crea, organiza y administra tus proyectos de cultivo.',
-          style: TextStyle(color: AppPalette.textSecondary),
+          style: TextStyle(color: AppPalette.textSecondaryOf(context)),
         ),
         const SizedBox(height: 14),
         Row(
@@ -212,12 +212,12 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           ],
         ),
         const SizedBox(height: 16),
-        const Text(
+        Text(
           'Mis proyectos',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
-            color: AppPalette.textPrimary,
+            color: AppPalette.textPrimaryOf(context),
           ),
         ),
         const SizedBox(height: 10),
@@ -299,9 +299,9 @@ class _ProjectTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        leading: const CircleAvatar(
-          backgroundColor: Color(0xFFEAF6F0),
-          child: Icon(Icons.eco_rounded, color: AppPalette.primary),
+        leading: CircleAvatar(
+          backgroundColor: AppPalette.softSurfaceOf(context),
+          child: const Icon(Icons.eco_rounded, color: AppPalette.primary),
         ),
         title: Text(title),
         subtitle: Text('$status · $details'),

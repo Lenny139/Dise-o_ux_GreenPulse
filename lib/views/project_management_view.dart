@@ -125,7 +125,9 @@ class _ProjectManagementScreenState extends State<ProjectManagementScreen> {
                       padding: const EdgeInsets.all(14),
                       child: Text(
                         'ID: lote_${_lote!.loteId} · Estado: ${_lote!.activo == 1 ? 'Activo' : 'Inactivo'}',
-                        style: const TextStyle(color: AppPalette.textSecondary),
+                        style: TextStyle(
+                          color: AppPalette.textSecondaryOf(context),
+                        ),
                       ),
                     ),
                   ),

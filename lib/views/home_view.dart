@@ -135,12 +135,12 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'Opciones principales',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: AppPalette.textPrimary,
+                color: AppPalette.textPrimaryOf(context),
               ),
             ),
             const SizedBox(height: 10),
@@ -177,9 +177,9 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
             const SizedBox(height: 16),
             Card(
               child: ListTile(
-                leading: const CircleAvatar(
-                  backgroundColor: Color(0xFFEAF6F0),
-                  child: Icon(Icons.eco_rounded, color: AppPalette.primary),
+                leading: CircleAvatar(
+                  backgroundColor: AppPalette.softSurfaceOf(context),
+                  child: const Icon(Icons.eco_rounded, color: AppPalette.primary),
                 ),
                 title: Text(
                   data.totalRegistros > 0
@@ -246,7 +246,7 @@ class _OptionCard extends StatelessWidget {
               height: 36,
               width: 36,
               decoration: BoxDecoration(
-                color: const Color(0xFFEAF6F0),
+                color: AppPalette.softSurfaceOf(context),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(icon, color: AppPalette.primary),
@@ -256,16 +256,16 @@ class _OptionCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w600,
-                    color: AppPalette.textPrimary,
+                    color: AppPalette.textPrimaryOf(context),
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  style: const TextStyle(
-                    color: AppPalette.textSecondary,
+                  style: TextStyle(
+                    color: AppPalette.textSecondaryOf(context),
                     fontSize: 12,
                   ),
                 ),

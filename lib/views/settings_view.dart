@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../app_palette.dart';
+import '../core/app_theme_controller.dart';
 import '../services/settings_service.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -40,6 +41,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _tema = (data['tema'] ?? 'Claro (GreenPulse)').toString();
         _privacidadModo = (data['privacidad_modo'] ?? 'Estándar').toString();
       });
+      AppThemeController.applyThemeLabel(_tema);
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -65,6 +67,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _tema = (data['tema'] ?? 'Claro (GreenPulse)').toString();
         _privacidadModo = (data['privacidad_modo'] ?? 'Estándar').toString();
       });
+      AppThemeController.applyThemeLabel(_tema);
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -160,18 +163,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
       children: [
-        const Text(
+        Text(
           'Ajustes',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: AppPalette.textPrimary,
+            color: AppPalette.textPrimaryOf(context),
           ),
         ),
         const SizedBox(height: 6),
-        const Text(
+        Text(
           'Configura tus preferencias principales de la aplicación.',
-          style: TextStyle(color: AppPalette.textSecondary),
+          style: TextStyle(color: AppPalette.textSecondaryOf(context)),
         ),
         const SizedBox(height: 14),
         Card(
@@ -254,7 +257,7 @@ class _SettingSwitchTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: CircleAvatar(
-        backgroundColor: const Color(0xFFEAF6F0),
+        backgroundColor: AppPalette.softSurfaceOf(context),
         child: Icon(icon, color: AppPalette.primary),
       ),
       title: Text(title),
@@ -282,7 +285,7 @@ class _SettingOptionTile extends StatelessWidget {
     return Card(
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: const Color(0xFFEAF6F0),
+          backgroundColor: AppPalette.softSurfaceOf(context),
           child: Icon(icon, color: AppPalette.primary),
         ),
         title: Text(title),

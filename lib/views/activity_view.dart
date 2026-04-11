@@ -227,18 +227,18 @@ class _ActivityScreenState extends State<ActivityScreen> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
       children: [
-        const Text(
+        Text(
           'Actividad',
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
-            color: AppPalette.textPrimary,
+            color: AppPalette.textPrimaryOf(context),
           ),
         ),
         const SizedBox(height: 6),
-        const Text(
+        Text(
           'Revisa el historial reciente de eventos en tus cultivos.',
-          style: TextStyle(color: AppPalette.textSecondary),
+          style: TextStyle(color: AppPalette.textSecondaryOf(context)),
         ),
         const SizedBox(height: 14),
         Row(
@@ -280,12 +280,12 @@ class _ActivityScreenState extends State<ActivityScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        const Text(
+        Text(
           'Historial reciente',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
-            color: AppPalette.textPrimary,
+            color: AppPalette.textPrimaryOf(context),
           ),
         ),
         const SizedBox(height: 10),
@@ -339,7 +339,7 @@ class _MiniStat extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
         decoration: BoxDecoration(
-          color: const Color(0xFFEAF6F0),
+          color: AppPalette.softSurfaceOf(context),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -348,17 +348,17 @@ class _MiniStat extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
-                color: AppPalette.textPrimary,
+                color: AppPalette.textPrimaryOf(context),
               ),
             ),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
-                color: AppPalette.textSecondary,
+                color: AppPalette.textSecondaryOf(context),
               ),
             ),
           ],
@@ -386,14 +386,17 @@ class _ActivityTile extends StatelessWidget {
     return Card(
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: const Color(0xFFEAF6F0),
+          backgroundColor: AppPalette.softSurfaceOf(context),
           child: Icon(icon, color: AppPalette.primary),
         ),
         title: Text(title),
         subtitle: Text(subtitle),
         trailing: Text(
           time,
-          style: const TextStyle(fontSize: 12, color: AppPalette.textSecondary),
+          style: TextStyle(
+            fontSize: 12,
+            color: AppPalette.textSecondaryOf(context),
+          ),
         ),
         onTap: () {},
       ),

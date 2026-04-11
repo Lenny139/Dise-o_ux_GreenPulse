@@ -3,7 +3,9 @@ import 'package:flutter/foundation.dart';
 
 import 'app_palette.dart';
 import 'core/api_client.dart';
+import 'core/app_theme_controller.dart';
 import 'services/auth_service.dart';
+import 'services/settings_service.dart';
 import 'views/activity_view.dart';
 import 'views/auth_view.dart';
 import 'views/home_view.dart';
@@ -21,67 +23,79 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: AppThemeController.themeMode,
+      builder: (context, themeMode, _) {
+        return MaterialApp(
+          title: 'GreenPulse UX',
+          debugShowCheckedModeBanner: false,
+          navigatorKey: _navigatorKey,
+          themeMode: themeMode,
+          builder: (context, child) {
+            if (child == null) {
+              return const SizedBox.shrink();
+            }
+
+            final screenWidth = MediaQuery.sizeOf(context).width;
+            final shouldUseAppViewport = kIsWeb || screenWidth >= 900;
+
+            if (!shouldUseAppViewport) {
+              return child;
+            }
+
+            return ColoredBox(
+              color: AppPalette.viewportBackgroundOf(context),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 430),
+                  child: child,
+                ),
+              ),
+            );
+          },
+          theme: _buildTheme(Brightness.light),
+          darkTheme: _buildTheme(Brightness.dark),
+          routes: {
+            '/login': (_) => const AuthScreen(),
+            '/home': (_) => const HomePage(),
+          },
+          home: const _AuthGate(),
+        );
+      },
+    );
+  }
+
+  ThemeData _buildTheme(Brightness brightness) {
     final colorScheme =
         ColorScheme.fromSeed(
           seedColor: AppPalette.primary,
-          brightness: Brightness.light,
+          brightness: brightness,
         ).copyWith(
           primary: AppPalette.primary,
           secondary: AppPalette.secondary,
-          surface: AppPalette.surface,
-          onPrimary: Colors.white,
-          onSurface: AppPalette.textPrimary,
         );
 
-    return MaterialApp(
-      title: 'GreenPulse UX',
-      debugShowCheckedModeBanner: false,
-      navigatorKey: _navigatorKey,
-      builder: (context, child) {
-        if (child == null) {
-          return const SizedBox.shrink();
-        }
-
-        final screenWidth = MediaQuery.sizeOf(context).width;
-        final shouldUseAppViewport = kIsWeb || screenWidth >= 900;
-
-        if (!shouldUseAppViewport) {
-          return child;
-        }
-
-        return ColoredBox(
-          color: AppPalette.background,
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 430),
-              child: child,
-            ),
-          ),
-        );
-      },
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: colorScheme,
-        scaffoldBackgroundColor: AppPalette.background,
-        appBarTheme: const AppBarTheme(
-          backgroundColor: AppPalette.surface,
-          foregroundColor: AppPalette.textPrimary,
-          centerTitle: false,
-        ),
-        cardTheme: CardThemeData(
-          color: AppPalette.surface,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: AppPalette.border),
-          ),
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: colorScheme,
+      scaffoldBackgroundColor: colorScheme.surface,
+      appBarTheme: AppBarTheme(
+        backgroundColor: colorScheme.surface,
+        foregroundColor: colorScheme.onSurface,
+        centerTitle: false,
+      ),
+      cardTheme: CardThemeData(
+        color: colorScheme.surfaceContainerLow,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: colorScheme.outlineVariant),
         ),
       ),
-      routes: {
-        '/login': (_) => const AuthScreen(),
-        '/home': (_) => const HomePage(),
-      },
-      home: const _AuthGate(),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.35),
+      ),
     );
   }
 }
@@ -136,6 +150,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
+  final _settingsService = SettingsService();
 
   static const List<String> _navLabels = [
     'Inicio',
@@ -171,6 +186,20 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _syncThemeWithBackend();
+  }
+
+  Future<void> _syncThemeWithBackend() async {
+    try {
+      final ajustes = await _settingsService.getAjustes();
+      final tema = ajustes['tema']?.toString() ?? 'Claro (GreenPulse)';
+      AppThemeController.applyThemeLabel(tema);
+    } catch (_) {}
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -200,7 +229,7 @@ class _HomePageState extends State<HomePage> {
             _selectedIndex = index;
           });
         },
-        indicatorColor: const Color(0xFFDCEFE5),
+        indicatorColor: AppPalette.navIndicatorOf(context),
         destinations: List.generate(
           _navLabels.length,
           (index) => NavigationDestination(
