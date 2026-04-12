@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../app_palette.dart';
+import '../core/app_language_controller.dart';
 import '../core/app_theme_controller.dart';
+import '../core/app_text.dart';
 import '../services/settings_service.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -52,6 +54,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _tema = (data['tema'] ?? 'Claro (GreenPulse)').toString();
         _privacidadModo = (data['privacidad_modo'] ?? 'Estándar').toString();
       });
+      AppLanguageController.applyLanguageLabel(_idioma);
       AppThemeController.applyThemeLabel(_tema);
     } catch (error) {
       if (!mounted) return;
@@ -84,6 +87,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _tema = (data['tema'] ?? 'Claro (GreenPulse)').toString();
         _privacidadModo = (data['privacidad_modo'] ?? 'Estándar').toString();
       });
+      AppLanguageController.applyLanguageLabel(_idioma);
       AppThemeController.applyThemeLabel(_tema);
       return true;
     } catch (error) {
@@ -120,16 +124,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _selectIdioma() async {
-    final options = ['Español', 'English'];
+    final options = const [
+      {'value': 'Español', 'label': 'Español'},
+      {'value': 'English', 'label': 'English'},
+    ];
     final selected = await showDialog<String>(
       context: context,
       builder: (context) => SimpleDialog(
-        title: const Text('Idioma'),
+        title: Text(AppText.t(es: 'Idioma', en: 'Language')),
         children: options
             .map(
-              (value) => SimpleDialogOption(
-                onPressed: () => Navigator.pop(context, value),
-                child: Text(value),
+              (option) => SimpleDialogOption(
+                onPressed: () => Navigator.pop(context, option['value'] as String),
+                child: Text(option['label'] as String),
               ),
             )
             .toList(),
@@ -203,7 +210,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
       children: [
         Text(
-          'Ajustes',
+          AppText.t(es: 'Ajustes', en: 'Settings'),
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -212,7 +219,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
         const SizedBox(height: 6),
         Text(
-          'Configura tus preferencias principales de la aplicación.',
+          AppText.t(
+            es: 'Configura tus preferencias principales de la aplicación.',
+            en: 'Configure your main app preferences.',
+          ),
           style: TextStyle(color: AppPalette.textSecondaryOf(context)),
         ),
         const SizedBox(height: 14),
@@ -221,16 +231,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
             children: [
               _SettingSwitchTile(
                 icon: Icons.notifications_none_rounded,
-                title: 'Notificaciones',
-                subtitle: 'Alertas de riego y eventos',
+                title: AppText.t(es: 'Notificaciones', en: 'Notifications'),
+                subtitle: AppText.t(
+                  es: 'Alertas de riego y eventos',
+                  en: 'Irrigation and event alerts',
+                ),
                 value: _notificacionesActivas,
                 onChanged: _saving ? null : _toggleNotificaciones,
               ),
               const Divider(height: 1),
               _SettingSwitchTile(
                 icon: Icons.volume_up_outlined,
-                title: 'Sonidos',
-                subtitle: 'Avisos de actividad y alertas',
+                title: AppText.t(es: 'Sonidos', en: 'Sounds'),
+                subtitle: AppText.t(
+                  es: 'Avisos de actividad y alertas',
+                  en: 'Activity and alert tones',
+                ),
                 value: _sonidosActivos,
                 onChanged: _saving ? null : _toggleSonidos,
               ),
@@ -240,29 +256,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
         const SizedBox(height: 12),
         _SettingOptionTile(
           icon: Icons.language_rounded,
-          title: 'Idioma',
+          title: AppText.t(es: 'Idioma', en: 'Language'),
           subtitle: _idioma,
           onTap: _selectIdioma,
         ),
         const SizedBox(height: 8),
         _SettingOptionTile(
           icon: Icons.palette_outlined,
-          title: 'Tema',
+          title: AppText.t(es: 'Tema', en: 'Theme'),
           subtitle: _tema,
           onTap: _selectTema,
         ),
         const SizedBox(height: 8),
         _SettingOptionTile(
           icon: Icons.security_rounded,
-          title: 'Privacidad',
+          title: AppText.t(es: 'Privacidad', en: 'Privacy'),
           subtitle: _privacidadModo,
           onTap: _selectPrivacidad,
         ),
         const SizedBox(height: 8),
         _SettingOptionTile(
           icon: Icons.info_outline_rounded,
-          title: 'Acerca de',
-          subtitle: 'Versión 1.0.0',
+          title: AppText.t(es: 'Acerca de', en: 'About'),
+          subtitle: AppText.t(es: 'Versión 1.0.0', en: 'Version 1.0.0'),
           onTap: _openAbout,
         ),
         if (_saving)

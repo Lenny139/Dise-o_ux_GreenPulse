@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../app_palette.dart';
+import '../core/app_text.dart';
 import '../models/lote.dart';
 import '../services/proyectos_service.dart';
 import 'project_management_view.dart';
@@ -51,27 +52,39 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Crear proyecto'),
+          title: Text(AppText.t(es: 'Crear proyecto', en: 'Create project')),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: nombreCtrl,
-                decoration: const InputDecoration(labelText: 'Nombre'),
+                decoration: InputDecoration(
+                  labelText: AppText.t(es: 'Nombre', en: 'Name'),
+                ),
               ),
               TextField(
                 controller: tipoCtrl,
-                decoration: const InputDecoration(labelText: 'Tipo de cultivo'),
+                decoration: InputDecoration(
+                  labelText: AppText.t(
+                    es: 'Tipo de cultivo',
+                    en: 'Crop type',
+                  ),
+                ),
               ),
               TextField(
                 controller: areaCtrl,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Área m²'),
+                decoration: InputDecoration(
+                  labelText: AppText.t(es: 'Área m²', en: 'Area m²'),
+                ),
               ),
               TextField(
                 controller: coordenadasCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'Coordenadas (latitud, longitud)',
+                decoration: InputDecoration(
+                  labelText: AppText.t(
+                    es: 'Coordenadas (latitud, longitud)',
+                    en: 'Coordinates (latitude, longitude)',
+                  ),
                 ),
               ),
             ],
@@ -79,11 +92,11 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancelar'),
+              child: Text(AppText.t(es: 'Cancelar', en: 'Cancel')),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text('Crear'),
+              child: Text(AppText.t(es: 'Crear', en: 'Create')),
             ),
           ],
         );
@@ -122,7 +135,9 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Proyecto creado')));
+      ).showSnackBar(
+        SnackBar(content: Text(AppText.t(es: 'Proyecto creado', en: 'Project created'))),
+      );
       await _loadProyectos();
     } catch (error) {
       if (!mounted) return;
@@ -138,16 +153,21 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Eliminar proyecto'),
-        content: Text('¿Eliminar "${lote.nombre}"?'),
+        title: Text(AppText.t(es: 'Eliminar proyecto', en: 'Delete project')),
+        content: Text(
+          AppText.t(
+            es: '¿Eliminar "${lote.nombre}"?',
+            en: 'Delete "${lote.nombre}"?',
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
+            child: Text(AppText.t(es: 'Cancelar', en: 'Cancel')),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Eliminar'),
+            child: Text(AppText.t(es: 'Eliminar', en: 'Delete')),
           ),
         ],
       ),
@@ -175,7 +195,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
       children: [
         Text(
-          'Proyectos',
+          AppText.t(es: 'Proyectos', en: 'Projects'),
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -184,7 +204,10 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
         ),
         const SizedBox(height: 6),
         Text(
-          'Crea, organiza y administra tus proyectos de cultivo.',
+          AppText.t(
+            es: 'Crea, organiza y administra tus proyectos de cultivo.',
+            en: 'Create, organize and manage your crop projects.',
+          ),
           style: TextStyle(color: AppPalette.textSecondaryOf(context)),
         ),
         const SizedBox(height: 14),
@@ -194,7 +217,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               child: FilledButton.icon(
                 onPressed: _crearProyectoDialog,
                 icon: const Icon(Icons.add_rounded),
-                label: const Text('Crear proyecto'),
+                label: Text(AppText.t(es: 'Crear proyecto', en: 'Create project')),
               ),
             ),
           ],
@@ -206,14 +229,14 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
               child: OutlinedButton.icon(
                 onPressed: _loadProyectos,
                 icon: const Icon(Icons.tune_rounded),
-                label: const Text('Administrar proyecto'),
+                label: Text(AppText.t(es: 'Administrar proyecto', en: 'Manage project')),
               ),
             ),
           ],
         ),
         const SizedBox(height: 16),
         Text(
-          'Mis proyectos',
+          AppText.t(es: 'Mis proyectos', en: 'My projects'),
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -307,7 +330,7 @@ class _ProjectTile extends StatelessWidget {
         subtitle: Text('$status · $details'),
         trailing: OutlinedButton(
           onPressed: onManage,
-          child: const Text('Gestionar'),
+          child: Text(AppText.t(es: 'Gestionar', en: 'Manage')),
         ),
       ),
     );

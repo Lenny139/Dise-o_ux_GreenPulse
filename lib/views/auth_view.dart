@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../app_palette.dart';
+import '../core/app_text.dart';
 import '../services/auth_service.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -70,7 +71,14 @@ class _AuthScreenState extends State<AuthScreen> {
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registro exitoso. Ahora inicia sesión.')),
+        SnackBar(
+          content: Text(
+            AppText.t(
+              es: 'Registro exitoso. Ahora inicia sesión.',
+              en: 'Registration successful. Please sign in now.',
+            ),
+          ),
+        ),
       );
     } catch (error) {
       if (!mounted) return;
@@ -91,10 +99,10 @@ class _AuthScreenState extends State<AuthScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('GreenPulse'),
-          bottom: const TabBar(
+          bottom: TabBar(
             tabs: [
-              Tab(text: 'Iniciar Sesión'),
-              Tab(text: 'Registrarse'),
+              Tab(text: 'Login'),
+              Tab(text: 'Register'),
             ],
           ),
         ),
@@ -116,20 +124,27 @@ class _AuthScreenState extends State<AuthScreen> {
                 children: [
                   TextFormField(
                     controller: _loginCorreoCtrl,
-                    decoration: const InputDecoration(labelText: 'Correo'),
+                    decoration: InputDecoration(
+                      labelText: AppText.t(es: 'Correo', en: 'Email'),
+                    ),
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) =>
                         (value == null || value.trim().isEmpty)
-                        ? 'Ingresa tu correo'
+                        ? AppText.t(es: 'Ingresa tu correo', en: 'Enter your email')
                         : null,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _loginContrasenaCtrl,
-                    decoration: const InputDecoration(labelText: 'Contraseña'),
+                    decoration: InputDecoration(
+                      labelText: AppText.t(es: 'Contraseña', en: 'Password'),
+                    ),
                     obscureText: true,
                     validator: (value) => (value == null || value.isEmpty)
-                        ? 'Ingresa tu contraseña'
+                        ? AppText.t(
+                            es: 'Ingresa tu contraseña',
+                            en: 'Enter your password',
+                          )
                         : null,
                   ),
                   const SizedBox(height: 20),
@@ -143,7 +158,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               height: 20,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : const Text('Iniciar Sesión'),
+                          : Text(AppText.t(es: 'Iniciar Sesión', en: 'Sign in')),
                     ),
                   ),
                 ],
@@ -168,29 +183,38 @@ class _AuthScreenState extends State<AuthScreen> {
                 children: [
                   TextFormField(
                     controller: _registroNombreCtrl,
-                    decoration: const InputDecoration(labelText: 'Nombre'),
+                    decoration: InputDecoration(
+                      labelText: AppText.t(es: 'Nombre', en: 'Name'),
+                    ),
                     validator: (value) =>
                         (value == null || value.trim().isEmpty)
-                        ? 'Ingresa tu nombre'
+                        ? AppText.t(es: 'Ingresa tu nombre', en: 'Enter your name')
                         : null,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _registroCorreoCtrl,
-                    decoration: const InputDecoration(labelText: 'Correo'),
+                    decoration: InputDecoration(
+                      labelText: AppText.t(es: 'Correo', en: 'Email'),
+                    ),
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) =>
                         (value == null || value.trim().isEmpty)
-                        ? 'Ingresa tu correo'
+                        ? AppText.t(es: 'Ingresa tu correo', en: 'Enter your email')
                         : null,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: _registroContrasenaCtrl,
-                    decoration: const InputDecoration(labelText: 'Contraseña'),
+                    decoration: InputDecoration(
+                      labelText: AppText.t(es: 'Contraseña', en: 'Password'),
+                    ),
                     obscureText: true,
                     validator: (value) => (value == null || value.isEmpty)
-                        ? 'Ingresa tu contraseña'
+                        ? AppText.t(
+                            es: 'Ingresa tu contraseña',
+                            en: 'Enter your password',
+                          )
                         : null,
                   ),
                   const SizedBox(height: 20),
@@ -207,7 +231,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               height: 20,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : const Text('Registrarse'),
+                          : Text(AppText.t(es: 'Registrarse', en: 'Register')),
                     ),
                   ),
                 ],

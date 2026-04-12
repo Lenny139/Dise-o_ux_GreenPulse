@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../app_palette.dart';
+import '../core/app_text.dart';
 import '../models/lote.dart';
 import '../models/registro_agronomico.dart';
 import '../services/cultivos_service.dart';
@@ -70,7 +71,14 @@ class _ActivityScreenState extends State<ActivityScreen> {
   Future<void> _abrirNuevoRegistro() async {
     if (_loteActivo == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No hay proyecto activo disponible')),
+        SnackBar(
+          content: Text(
+            AppText.t(
+              es: 'No hay proyecto activo disponible',
+              en: 'No active project available',
+            ),
+          ),
+        ),
       );
       return;
     }
@@ -97,22 +105,30 @@ class _ActivityScreenState extends State<ActivityScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
-                    'Nuevo registro',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  Text(
+                    AppText.t(es: 'Nuevo registro', en: 'New record'),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: tempCtrl,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Temperatura °C',
+                    decoration: InputDecoration(
+                      labelText: AppText.t(
+                        es: 'Temperatura °C',
+                        en: 'Temperature °C',
+                      ),
                     ),
                   ),
                   TextField(
                     controller: humedadCtrl,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(labelText: 'Humedad %'),
+                    decoration: InputDecoration(
+                      labelText: AppText.t(es: 'Humedad %', en: 'Humidity %'),
+                    ),
                   ),
                   TextField(
                     controller: phCtrl,
@@ -121,8 +137,11 @@ class _ActivityScreenState extends State<ActivityScreen> {
                   ),
                   TextField(
                     controller: obsCtrl,
-                    decoration: const InputDecoration(
-                      labelText: 'Observaciones',
+                    decoration: InputDecoration(
+                      labelText: AppText.t(
+                        es: 'Observaciones',
+                        en: 'Notes',
+                      ),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -173,7 +192,12 @@ class _ActivityScreenState extends State<ActivityScreen> {
                               height: 20,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : const Text('Guardar registro'),
+                          : Text(
+                              AppText.t(
+                                es: 'Guardar registro',
+                                en: 'Save record',
+                              ),
+                            ),
                     ),
                   ),
                 ],
@@ -189,7 +213,14 @@ class _ActivityScreenState extends State<ActivityScreen> {
       final alertas = _cultivosService.lastAlertasGeneradas;
       if (alertas > 0 && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('⚠️ Se generaron $alertas alertas nuevas')),
+            SnackBar(
+              content: Text(
+                AppText.t(
+                  es: '⚠️ Se generaron $alertas alertas nuevas',
+                  en: '⚠️ $alertas new alerts were generated',
+                ),
+              ),
+            ),
         );
       }
     }
@@ -228,7 +259,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
       children: [
         Text(
-          'Actividad',
+          AppText.t(es: 'Actividad', en: 'Activity'),
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -237,7 +268,10 @@ class _ActivityScreenState extends State<ActivityScreen> {
         ),
         const SizedBox(height: 6),
         Text(
-          'Revisa el historial reciente de eventos en tus cultivos.',
+          AppText.t(
+            es: 'Revisa el historial reciente de eventos en tus cultivos.',
+            en: 'Review the recent history of events in your crops.',
+          ),
           style: TextStyle(color: AppPalette.textSecondaryOf(context)),
         ),
         const SizedBox(height: 14),
@@ -247,7 +281,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
               child: FilledButton.icon(
                 onPressed: _abrirNuevoRegistro,
                 icon: const Icon(Icons.add_rounded),
-                label: const Text('Nuevo registro'),
+                label: Text(AppText.t(es: 'Nuevo registro', en: 'New record')),
               ),
             ),
           ],
@@ -259,19 +293,19 @@ class _ActivityScreenState extends State<ActivityScreen> {
             child: Row(
               children: [
                 _MiniStat(
-                  label: 'Hoy',
+                  label: AppText.t(es: 'Hoy', en: 'Today'),
                   value: hoy.toString(),
                   icon: Icons.today_rounded,
                 ),
                 const SizedBox(width: 10),
                 _MiniStat(
-                  label: 'Semana',
+                  label: AppText.t(es: 'Semana', en: 'Week'),
                   value: semana.toString(),
                   icon: Icons.date_range_rounded,
                 ),
                 const SizedBox(width: 10),
                 _MiniStat(
-                  label: 'Alertas',
+                  label: AppText.t(es: 'Alertas', en: 'Alerts'),
                   value: _cultivosService.lastAlertasGeneradas.toString(),
                   icon: Icons.warning_amber_rounded,
                 ),
@@ -281,7 +315,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
         ),
         const SizedBox(height: 16),
         Text(
-          'Historial reciente',
+          AppText.t(es: 'Historial reciente', en: 'Recent history'),
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,

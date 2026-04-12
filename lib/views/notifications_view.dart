@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../app_palette.dart';
+import '../core/app_text.dart';
 import '../models/alerta.dart';
 import '../services/alertas_service.dart';
 
@@ -46,7 +47,16 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Alerta marcada como leída')));
+      ).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppText.t(
+              es: 'Alerta marcada como leída',
+              en: 'Alert marked as read',
+            ),
+          ),
+        ),
+      );
       await _loadAlertas();
     } catch (error) {
       if (!mounted) return;
@@ -59,7 +69,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   }
 
   String _formatDate(DateTime? value) {
-    if (value == null) return 'Sin fecha';
+    if (value == null) return AppText.t(es: 'Sin fecha', en: 'No date');
     final local = value.toLocal();
     final year = local.year.toString().padLeft(4, '0');
     final month = local.month.toString().padLeft(2, '0');
@@ -72,7 +82,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Notificaciones')),
+      appBar: AppBar(
+        title: Text(AppText.t(es: 'Notificaciones', en: 'Notifications')),
+      ),
       body: RefreshIndicator(
         onRefresh: _loadAlertas,
         child: _loading
@@ -83,7 +95,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   const SizedBox(height: 120),
                   Center(
                     child: Text(
-                      'No tienes alertas pendientes.',
+                      AppText.t(
+                        es: 'No tienes alertas pendientes.',
+                        en: 'You have no pending alerts.',
+                      ),
                       style: TextStyle(
                         color: AppPalette.textSecondaryOf(context),
                       ),
@@ -107,7 +122,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       subtitle: Text(_formatDate(alerta.fechaHora)),
                       trailing: TextButton(
                         onPressed: () => _marcarLeida(alerta),
-                        child: const Text('Marcar leída'),
+                        child: Text(
+                          AppText.t(es: 'Marcar leída', en: 'Mark as read'),
+                        ),
                       ),
                     ),
                   );

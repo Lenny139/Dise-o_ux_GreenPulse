@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../app_palette.dart';
+import '../core/app_text.dart';
 import '../services/auth_service.dart';
 import 'notifications_view.dart';
 
@@ -69,29 +70,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final save = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Editar perfil'),
+        title: Text(AppText.t(es: 'Editar perfil', en: 'Edit profile')),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: nombreCtrl,
-              decoration: const InputDecoration(labelText: 'Nombre'),
+              decoration: InputDecoration(
+                labelText: AppText.t(es: 'Nombre', en: 'Name'),
+              ),
             ),
             TextField(
               controller: correoCtrl,
               keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(labelText: 'Correo'),
+              decoration: InputDecoration(
+                labelText: AppText.t(es: 'Correo', en: 'Email'),
+              ),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
+            child: Text(AppText.t(es: 'Cancelar', en: 'Cancel')),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Guardar'),
+            child: Text(AppText.t(es: 'Guardar', en: 'Save')),
           ),
         ],
       ),
@@ -103,7 +108,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final correo = correoCtrl.text.trim().toLowerCase();
     if (nombre.isEmpty || correo.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Nombre y correo son obligatorios')),
+        SnackBar(
+          content: Text(
+            AppText.t(
+              es: 'Nombre y correo son obligatorios',
+              en: 'Name and email are required',
+            ),
+          ),
+        ),
       );
       return;
     }
@@ -114,7 +126,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Perfil actualizado')));
+      ).showSnackBar(
+        SnackBar(content: Text(AppText.t(es: 'Perfil actualizado', en: 'Profile updated'))),
+      );
     } catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -132,30 +146,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final save = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Cambiar contraseña'),
+        title: Text(
+          AppText.t(es: 'Cambiar contraseña', en: 'Change password'),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: actualCtrl,
               obscureText: true,
-              decoration: const InputDecoration(labelText: 'Contraseña actual'),
+              decoration: InputDecoration(
+                labelText: AppText.t(
+                  es: 'Contraseña actual',
+                  en: 'Current password',
+                ),
+              ),
             ),
             TextField(
               controller: nuevaCtrl,
               obscureText: true,
-              decoration: const InputDecoration(labelText: 'Nueva contraseña'),
+              decoration: InputDecoration(
+                labelText: AppText.t(
+                  es: 'Nueva contraseña',
+                  en: 'New password',
+                ),
+              ),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
+            child: Text(AppText.t(es: 'Cancelar', en: 'Cancel')),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Actualizar'),
+            child: Text(AppText.t(es: 'Actualizar', en: 'Update')),
           ),
         ],
       ),
@@ -168,7 +194,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (actualContrasena.isEmpty || nuevaContrasena.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Completa ambas contraseñas')),
+        SnackBar(
+          content: Text(
+            AppText.t(
+              es: 'Completa ambas contraseñas',
+              en: 'Complete both passwords',
+            ),
+          ),
+        ),
       );
       return;
     }
@@ -180,7 +213,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Contraseña actualizada')),
+        SnackBar(
+          content: Text(
+            AppText.t(es: 'Contraseña actualizada', en: 'Password updated'),
+          ),
+        ),
       );
     } catch (error) {
       if (!mounted) return;
@@ -196,14 +233,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Ayuda y soporte'),
-        content: const Text(
-          'Si tienes problemas, escríbenos a soporte@greenpulse.app',
+        title: Text(AppText.t(es: 'Ayuda y soporte', en: 'Help and support')),
+        content: Text(
+          AppText.t(
+            es: 'Si tienes problemas, escríbenos a soporte@greenpulse.app',
+            en: 'If you need help, write to soporte@greenpulse.app',
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cerrar'),
+            child: Text(AppText.t(es: 'Cerrar', en: 'Close')),
           ),
         ],
       ),
@@ -220,7 +260,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
       children: [
         Text(
-          'Perfil',
+          AppText.t(es: 'Perfil', en: 'Profile'),
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -263,7 +303,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       SizedBox(height: 2),
                       Text(
-                        'Productor',
+                        AppText.t(es: 'Productor', en: 'Producer'),
                         style: TextStyle(
                           color: AppPalette.textSecondaryOf(context),
                         ),
@@ -273,7 +313,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 OutlinedButton(
                   onPressed: _editarPerfilDialog,
-                  child: const Text('Editar'),
+                  child: Text(AppText.t(es: 'Editar', en: 'Edit')),
                 ),
               ],
             ),
@@ -281,7 +321,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         const SizedBox(height: 14),
         Text(
-          'Cuenta',
+          AppText.t(es: 'Cuenta', en: 'Account'),
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -291,22 +331,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const SizedBox(height: 10),
         _ProfileActionTile(
           icon: Icons.badge_outlined,
-          title: 'Datos personales',
-          subtitle: 'Nombre, correo y teléfono',
+          title: AppText.t(es: 'Datos personales', en: 'Personal data'),
+          subtitle: AppText.t(
+            es: 'Nombre, correo y teléfono',
+            en: 'Name, email and phone',
+          ),
           onTap: _editarPerfilDialog,
         ),
         const SizedBox(height: 8),
         _ProfileActionTile(
           icon: Icons.lock_outline_rounded,
-          title: 'Seguridad',
-          subtitle: 'Contraseña y acceso',
+          title: AppText.t(es: 'Seguridad', en: 'Security'),
+          subtitle: AppText.t(es: 'Contraseña y acceso', en: 'Password and access'),
           onTap: _cambiarContrasenaDialog,
         ),
         const SizedBox(height: 8),
         _ProfileActionTile(
           icon: Icons.notifications_none_rounded,
-          title: 'Notificaciones',
-          subtitle: 'Recordatorios y alertas',
+          title: AppText.t(es: 'Notificaciones', en: 'Notifications'),
+          subtitle: AppText.t(
+            es: 'Recordatorios y alertas',
+            en: 'Reminders and alerts',
+          ),
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(
@@ -318,8 +364,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         const SizedBox(height: 8),
         _ProfileActionTile(
           icon: Icons.help_outline_rounded,
-          title: 'Ayuda y soporte',
-          subtitle: 'Centro de ayuda',
+          title: AppText.t(es: 'Ayuda y soporte', en: 'Help and support'),
+          subtitle: AppText.t(es: 'Centro de ayuda', en: 'Help center'),
           onTap: _openHelp,
         ),
         const SizedBox(height: 16),
@@ -332,7 +378,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   height: 18,
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
-              : const Text('Cerrar sesión'),
+                  : Text(AppText.t(es: 'Cerrar sesión', en: 'Log out')),
         ),
       ],
     );

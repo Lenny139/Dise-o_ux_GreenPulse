@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../app_palette.dart';
+import '../core/app_text.dart';
 import '../models/lote.dart';
 import '../services/estadisticas_service.dart';
 import '../services/eventos_service.dart';
@@ -115,28 +116,33 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 color: AppPalette.primary,
                 borderRadius: BorderRadius.circular(18),
               ),
-              child: const Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '¡Bienvenido a GreenPulse!',
+                    'GreenPulse',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
-                    'Gestiona tus cultivos, registra actividades y consulta el estado de tus lotes en un solo lugar.',
-                    style: TextStyle(color: Color(0xFFE4F5EC), height: 1.4),
+                    AppText.t(
+                      es:
+                          'Gestiona tus cultivos, registra actividades y consulta el estado de tus lotes en un solo lugar.',
+                      en:
+                          'Manage your crops, record activities, and check lot status in one place.',
+                    ),
+                    style: const TextStyle(color: Color(0xFFE4F5EC), height: 1.4),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 16),
             Text(
-              'Opciones principales',
+              AppText.t(es: 'Opciones principales', en: 'Main options'),
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -151,26 +157,38 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               crossAxisSpacing: 10,
               mainAxisSpacing: 10,
               childAspectRatio: 1.25,
-              children: const [
+              children: [
                 _OptionCard(
                   icon: Icons.qr_code_scanner_rounded,
-                  title: 'Escanear QR',
-                  subtitle: 'Identificar lote rápido',
+                  title: 'QR',
+                  subtitle: AppText.t(
+                    es: 'Identificar lote rápido',
+                    en: 'Quick lot identification',
+                  ),
                 ),
                 _OptionCard(
                   icon: Icons.thermostat_rounded,
-                  title: 'Variables',
-                  subtitle: 'Temperatura, humedad, pH',
+                  title: AppText.t(es: 'Variables', en: 'Variables'),
+                  subtitle: AppText.t(
+                    es: 'Temperatura, humedad, pH',
+                    en: 'Temperature, humidity, pH',
+                  ),
                 ),
                 _OptionCard(
                   icon: Icons.calendar_month_rounded,
-                  title: 'Calendario',
-                  subtitle: 'Riego y fertilización',
+                  title: AppText.t(es: 'Calendario', en: 'Calendar'),
+                  subtitle: AppText.t(
+                    es: 'Riego y fertilización',
+                    en: 'Irrigation and fertilization',
+                  ),
                 ),
                 _OptionCard(
                   icon: Icons.warning_amber_rounded,
-                  title: 'Alertas',
-                  subtitle: 'Recordatorios importantes',
+                  title: AppText.t(es: 'Alertas', en: 'Alerts'),
+                  subtitle: AppText.t(
+                    es: 'Recordatorios importantes',
+                    en: 'Important reminders',
+                  ),
                 ),
               ],
             ),
@@ -183,13 +201,26 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 ),
                 title: Text(
                   data.totalRegistros > 0
-                      ? 'KPIs hoy: T° ${data.temperaturaPromedio?.toStringAsFixed(1) ?? '-'}°C · H ${data.humedadPromedio?.toStringAsFixed(1) ?? '-'}% · pH ${data.phPromedio?.toStringAsFixed(1) ?? '-'}'
-                      : 'Sin registros aún',
+                      ? AppText.t(
+                          es:
+                              'KPIs hoy: T° ${data.temperaturaPromedio?.toStringAsFixed(1) ?? '-'}°C · H ${data.humedadPromedio?.toStringAsFixed(1) ?? '-'}% · pH ${data.phPromedio?.toStringAsFixed(1) ?? '-'}',
+                          en:
+                              'Today\'s KPIs: T° ${data.temperaturaPromedio?.toStringAsFixed(1) ?? '-'}°C · H ${data.humedadPromedio?.toStringAsFixed(1) ?? '-'}% · pH ${data.phPromedio?.toStringAsFixed(1) ?? '-'}',
+                        )
+                      : AppText.t(es: 'Sin registros aún', en: 'No records yet'),
                 ),
                 subtitle: Text(
                   data.proximoRiegoFecha != null
-                      ? 'Próximo riego: ${data.proximoRiegoFecha} · ${data.proximoRiegoLote ?? ''}'
-                      : 'Próximo riego: sin programación',
+                      ? AppText.t(
+                          es:
+                              'Próximo riego: ${data.proximoRiegoFecha} · ${data.proximoRiegoLote ?? ''}',
+                          en:
+                              'Next irrigation: ${data.proximoRiegoFecha} · ${data.proximoRiegoLote ?? ''}',
+                        )
+                      : AppText.t(
+                          es: 'Próximo riego: sin programación',
+                          en: 'Next irrigation: not scheduled',
+                        ),
                 ),
                 trailing: Icon(
                   Icons.chevron_right_rounded,

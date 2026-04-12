@@ -3,7 +3,9 @@ import 'package:flutter/foundation.dart';
 
 import 'app_palette.dart';
 import 'core/api_client.dart';
+import 'core/app_language_controller.dart';
 import 'core/app_theme_controller.dart';
+import 'core/app_text.dart';
 import 'services/auth_service.dart';
 import 'services/settings_service.dart';
 import 'views/activity_view.dart';
@@ -23,43 +25,49 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<ThemeMode>(
-      valueListenable: AppThemeController.themeMode,
-      builder: (context, themeMode, _) {
-        return MaterialApp(
-          title: 'GreenPulse UX',
-          debugShowCheckedModeBanner: false,
-          navigatorKey: _navigatorKey,
-          themeMode: themeMode,
-          builder: (context, child) {
-            if (child == null) {
-              return const SizedBox.shrink();
-            }
+    return ValueListenableBuilder<Locale>(
+      valueListenable: AppLanguageController.locale,
+      builder: (context, locale, _) {
+        return ValueListenableBuilder<ThemeMode>(
+          valueListenable: AppThemeController.themeMode,
+          builder: (context, themeMode, _) {
+            return MaterialApp(
+              title: 'GreenPulse UX',
+              debugShowCheckedModeBanner: false,
+              navigatorKey: _navigatorKey,
+              locale: locale,
+              themeMode: themeMode,
+              builder: (context, child) {
+                if (child == null) {
+                  return const SizedBox.shrink();
+                }
 
-            final screenWidth = MediaQuery.sizeOf(context).width;
-            final shouldUseAppViewport = kIsWeb || screenWidth >= 900;
+                final screenWidth = MediaQuery.sizeOf(context).width;
+                final shouldUseAppViewport = kIsWeb || screenWidth >= 900;
 
-            if (!shouldUseAppViewport) {
-              return child;
-            }
+                if (!shouldUseAppViewport) {
+                  return child;
+                }
 
-            return ColoredBox(
-              color: AppPalette.viewportBackgroundOf(context),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 430),
-                  child: child,
-                ),
-              ),
+                return ColoredBox(
+                  color: AppPalette.viewportBackgroundOf(context),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 430),
+                      child: child,
+                    ),
+                  ),
+                );
+              },
+              theme: _buildTheme(Brightness.light),
+              darkTheme: _buildTheme(Brightness.dark),
+              routes: {
+                '/login': (_) => const AuthScreen(),
+                '/home': (_) => const HomePage(),
+              },
+              home: const _AuthGate(),
             );
           },
-          theme: _buildTheme(Brightness.light),
-          darkTheme: _buildTheme(Brightness.dark),
-          routes: {
-            '/login': (_) => const AuthScreen(),
-            '/home': (_) => const HomePage(),
-          },
-          home: const _AuthGate(),
         );
       },
     );
@@ -152,14 +160,6 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   final _settingsService = SettingsService();
 
-  static const List<String> _navLabels = [
-    'Inicio',
-    'Proyectos',
-    'Actividad',
-    'Perfil',
-    'Ajustes',
-  ];
-
   static const List<IconData> _navIcons = [
     Icons.home_rounded,
     Icons.folder_open_rounded,
@@ -185,6 +185,14 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  List<String> get _navLabels => [
+        AppText.t(es: 'Inicio', en: 'Home'),
+        AppText.t(es: 'Proyectos', en: 'Projects'),
+        AppText.t(es: 'Actividad', en: 'Activity'),
+        AppText.t(es: 'Perfil', en: 'Profile'),
+        AppText.t(es: 'Ajustes', en: 'Settings'),
+      ];
+
   @override
   void initState() {
     super.initState();
@@ -195,6 +203,8 @@ class _HomePageState extends State<HomePage> {
     try {
       final ajustes = await _settingsService.getAjustes();
       final tema = ajustes['tema']?.toString() ?? 'Claro (GreenPulse)';
+      final idioma = ajustes['idioma']?.toString() ?? 'Español';
+      AppLanguageController.applyLanguageLabel(idioma);
       AppThemeController.applyThemeLabel(tema);
     } catch (_) {}
   }
@@ -203,9 +213,9 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'GreenPulse',
-          style: TextStyle(fontWeight: FontWeight.w700),
+        title: Text(
+          AppText.t(es: 'GreenPulse', en: 'GreenPulse'),
+          style: const TextStyle(fontWeight: FontWeight.w700),
         ),
         actions: [
           IconButton(
