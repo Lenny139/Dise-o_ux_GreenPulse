@@ -90,46 +90,46 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         child: _loading
             ? const Center(child: CircularProgressIndicator())
             : _alertas.isEmpty
-            ? ListView(
-                children: [
-                  const SizedBox(height: 120),
-                  Center(
-                    child: Text(
-                      AppText.t(
-                        es: 'No tienes alertas pendientes.',
-                        en: 'You have no pending alerts.',
-                      ),
-                      style: TextStyle(
-                        color: AppPalette.textSecondaryOf(context),
-                      ),
-                    ),
-                  ),
-                ],
-              )
-            : ListView.separated(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-                itemCount: _alertas.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 10),
-                itemBuilder: (context, index) {
-                  final alerta = _alertas[index];
-                  return Card(
-                    child: ListTile(
-                      leading: const Icon(
-                        Icons.notification_important_rounded,
-                        color: AppPalette.primary,
-                      ),
-                      title: Text(alerta.mensaje),
-                      subtitle: Text(_formatDate(alerta.fechaHora)),
-                      trailing: TextButton(
-                        onPressed: () => _marcarLeida(alerta),
+                ? ListView(
+                    children: [
+                      const SizedBox(height: 120),
+                      Center(
                         child: Text(
-                          AppText.t(es: 'Marcar leída', en: 'Mark as read'),
+                          AppText.t(
+                            es: 'No tienes alertas pendientes.',
+                            en: 'You have no pending alerts.',
+                          ),
+                          style: TextStyle(
+                            color: AppPalette.textSecondaryOf(context),
+                          ),
                         ),
                       ),
-                    ),
-                  );
-                },
-              ),
+                    ],
+                  )
+                : ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                    itemCount: _alertas.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    itemBuilder: (context, index) {
+                      final alerta = _alertas[index];
+                      return Card(
+                        child: ListTile(
+                          leading: const Icon(
+                            Icons.notification_important_rounded,
+                            color: AppPalette.primary,
+                          ),
+                          title: Text(alerta.mensaje),
+                          subtitle: Text(_formatDate(alerta.fechaHora)),
+                          trailing: TextButton(
+                            onPressed: () => _marcarLeida(alerta),
+                            child: Text(
+                              AppText.t(es: 'Marcar leída', en: 'Mark as read'),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
       ),
     );
   }

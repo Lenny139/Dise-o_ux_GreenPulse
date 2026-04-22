@@ -98,22 +98,8 @@ lib/
 flutter pub get
 ```
 
-### 2. Configurar backend
 
-Crear archivo `lib/backend/.env` usando `lib/backend/.env.example` como base:
-
-```dotenv
-DB_HOST=localhost
-DB_PORT=3306
-DB_NAME=greenpulse
-DB_USER=tu_usuario
-DB_PASSWORD=tu_password
-JWT_SECRET=tu_secreto_jwt
-JWT_EXPIRES_IN=7d
-PORT=3000
-```
-
-### 3. Base URL del frontend
+### 2. Base URL del frontend
 
 En emulador Android, la app consume por defecto:
 

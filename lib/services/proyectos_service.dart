@@ -1,128 +1,110 @@
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/api_client.dart';
-import '../models/lote.dart';
+import '../core/constants.dart';
+import '../models/proyecto.dart';
+import '../backup/repositories/proyectos_repository.dart';
 
 class ProyectosService {
   final Dio _dio = ApiClient.instance.dio;
+  final _repo = ProyectosRepository.instance;
 
-  Future<List<Lote>> getProyectos() async {
+  Future<List<Proyecto>> getProyectos() async {
     try {
-      final response = await _dio.get('/proyectos');
-      final data = _asMap(response.data);
-      final list = _extractList(data, preferredKey: 'proyectos');
-      return list.map((item) => Lote.fromJson(_normalizeLote(item))).toList();
-    } on DioException catch (error) {
-      throw Exception(ApiClient.readableError(error));
+      final prefs = await SharedPreferences.getInstance();
+      final usuarioId = prefs.getInt(USUARIO_ID_KEY);
+      final params = <String, dynamic>{'solo_activos': true};
+      if (usuarioId != null) params['usuario_id'] = usuarioId;
+
+      final response = await _dio.get('/proyectos', queryParameters: params);
+      final list = response.data;
+      if (list is! List) return const [];
+
+      final proyectos = list
+          .whereType<Map>()
+          .map((item) => Proyecto.fromJson(_asMap(item)))
+          .toList();
+
+      await _repo.guardarProyectos(proyectos);
+      return proyectos;
+    } on DioException {
+      // Sin conexión → datos locales
+      return _repo.obtenerProyectos();
     }
   }
 
-  Future<Lote> getProyecto(int id) async {
+  Future<Proyecto> getProyecto(int id) async {
     try {
       final response = await _dio.get('/proyectos/$id');
-      final data = _asMap(response.data);
-
-      final payload = (data['proyecto'] is Map)
-          ? _asMap(data['proyecto'])
-          : (data['data'] is Map)
-          ? _asMap(data['data'])
-          : data;
-
-      return Lote.fromJson(_normalizeLote(payload));
-    } on DioException catch (error) {
-      throw Exception(ApiClient.readableError(error));
+      final proyecto = Proyecto.fromJson(_asMap(response.data));
+      await _repo.guardarProyectos([proyecto]);
+      return proyecto;
+    } on DioException {
+      final local = await _repo.obtenerProyecto(id);
+      if (local != null) return local;
+      throw Exception('Proyecto no disponible sin conexión');
     }
   }
 
-  Future<Lote> crearProyecto(Map<String, dynamic> data) async {
+  Future<Proyecto> crearProyecto({
+    required String nombre,
+    required String tipo,
+    String? coordenadas,
+    String? descripcion,
+    double? areaMetrosCuadrados,
+  }) async {
     try {
+      final data = <String, dynamic>{'nombre': nombre, 'tipo': tipo};
+      if (coordenadas != null && coordenadas.isNotEmpty) {
+        data['coordenadas'] = coordenadas;
+        data['ubicacion_texto'] = coordenadas;
+      }
+      if (descripcion != null) data['descripcion'] = descripcion;
+      if (areaMetrosCuadrados != null) {
+        data['area_metros_cuadrados'] = areaMetrosCuadrados;
+      }
       final response = await _dio.post('/proyectos', data: data);
-      final responseMap = _asMap(response.data);
-      return Lote.fromJson(_normalizeLote(responseMap));
-    } on DioException catch (error) {
-      throw Exception(ApiClient.readableError(error));
+      final proyecto = Proyecto.fromJson(_asMap(response.data));
+      await _repo.guardarProyectos([proyecto]);
+      return proyecto;
+    } on DioException catch (e) {
+      throw Exception(ApiClient.readableError(e));
+    }
+  }
+
+  Future<Proyecto> actualizarProyecto(
+    int id, {
+    String? nombre,
+    String? tipo,
+    String? descripcion,
+  }) async {
+    try {
+      final data = <String, dynamic>{};
+      if (nombre != null) data['nombre'] = nombre;
+      if (tipo != null) data['tipo'] = tipo;
+      if (descripcion != null) data['descripcion'] = descripcion;
+      final response = await _dio.put('/proyectos/$id', data: data);
+      final proyecto = Proyecto.fromJson(_asMap(response.data));
+      await _repo.guardarProyectos([proyecto]);
+      return proyecto;
+    } on DioException catch (e) {
+      throw Exception(ApiClient.readableError(e));
     }
   }
 
   Future<void> eliminarProyecto(int id) async {
     try {
       await _dio.delete('/proyectos/$id');
-    } on DioException catch (error) {
-      throw Exception(ApiClient.readableError(error));
+      await _repo.eliminarProyecto(id);
+    } on DioException catch (e) {
+      throw Exception(ApiClient.readableError(e));
     }
   }
 
-  Future<Lote> actualizarProyecto(int id, Map<String, dynamic> data) async {
-    try {
-      final response = await _dio.put('/proyectos/$id', data: data);
-      final responseMap = _asMap(response.data);
-
-      final payload = (responseMap['proyecto'] is Map)
-          ? _asMap(responseMap['proyecto'])
-          : (responseMap['data'] is Map)
-          ? _asMap(responseMap['data'])
-          : responseMap;
-
-      return Lote.fromJson(_normalizeLote(payload));
-    } on DioException catch (error) {
-      throw Exception(ApiClient.readableError(error));
-    }
-  }
-
-  List<Map<String, dynamic>> _extractList(
-    Map<String, dynamic> data, {
-    required String preferredKey,
-  }) {
-    final candidate = data[preferredKey] ?? data['data'] ?? data['items'];
-    if (candidate is List) {
-      return candidate
-          .whereType<Map>()
-          .map((item) => _asMap(item))
-          .toList(growable: false);
-    }
-
-    if (data.values.length == 1 && data.values.first is List) {
-      final list = data.values.first as List;
-      return list
-          .whereType<Map>()
-          .map((item) => _asMap(item))
-          .toList(growable: false);
-    }
-
-    return const [];
-  }
-
-  Map<String, dynamic> _normalizeLote(Map<String, dynamic> raw) {
-    final output = Map<String, dynamic>.from(raw);
-
-    final dynamic rawId =
-        output['lote_id'] ?? output['proyecto_id'] ?? output['id'];
-    if (rawId != null) {
-      output['lote_id'] = _parseLoteId(rawId);
-    }
-
-    if (!output.containsKey('fecha_inicio_cultivo')) {
-      output['fecha_inicio_cultivo'] = output['fecha_creacion'];
-    }
-
-    return output;
-  }
-
-  int _parseLoteId(dynamic value) {
-    if (value is int) return value;
-    final text = value.toString();
-    final match = RegExp(r'lote_(\d+)', caseSensitive: false).firstMatch(text);
-    if (match != null) {
-      return int.tryParse(match.group(1) ?? '') ?? 0;
-    }
-    return int.tryParse(text) ?? 0;
-  }
-
-  Map<String, dynamic> _asMap(dynamic value) {
-    if (value is Map<String, dynamic>) return value;
-    if (value is Map) {
-      return value.map((key, value) => MapEntry(key.toString(), value));
-    }
+  Map<String, dynamic> _asMap(dynamic v) {
+    if (v is Map<String, dynamic>) return v;
+    if (v is Map) return v.map((k, val) => MapEntry(k.toString(), val));
     throw Exception('Formato de respuesta inválido');
   }
 }

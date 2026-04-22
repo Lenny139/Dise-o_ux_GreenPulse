@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
 import 'app_palette.dart';
+import 'backup/database/local_database.dart';
 import 'core/api_client.dart';
 import 'core/app_language_controller.dart';
 import 'core/app_theme_controller.dart';
@@ -12,11 +13,13 @@ import 'views/activity_view.dart';
 import 'views/auth_view.dart';
 import 'views/home_view.dart';
 import 'views/notifications_view.dart';
-import 'views/profile_view.dart';
+import 'views/opciones_view.dart';
+import 'views/plantas_view.dart';
 import 'views/projects_view.dart';
-import 'views/settings_view.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await LocalDatabase.instance.database; // inicializa SQLite
   runApp(const MyApp());
 }
 
@@ -32,22 +35,18 @@ class MyApp extends StatelessWidget {
           valueListenable: AppThemeController.themeMode,
           builder: (context, themeMode, _) {
             return MaterialApp(
-              title: 'GreenPulse UX',
+              title: 'GreenPulse',
               debugShowCheckedModeBanner: false,
               navigatorKey: _navigatorKey,
               locale: locale,
               themeMode: themeMode,
               builder: (context, child) {
-                if (child == null) {
-                  return const SizedBox.shrink();
-                }
+                if (child == null) return const SizedBox.shrink();
 
                 final screenWidth = MediaQuery.sizeOf(context).width;
                 final shouldUseAppViewport = kIsWeb || screenWidth >= 900;
 
-                if (!shouldUseAppViewport) {
-                  return child;
-                }
+                if (!shouldUseAppViewport) return child;
 
                 return ColoredBox(
                   color: AppPalette.viewportBackgroundOf(context),
@@ -74,14 +73,13 @@ class MyApp extends StatelessWidget {
   }
 
   ThemeData _buildTheme(Brightness brightness) {
-    final colorScheme =
-        ColorScheme.fromSeed(
-          seedColor: AppPalette.primary,
-          brightness: brightness,
-        ).copyWith(
-          primary: AppPalette.primary,
-          secondary: AppPalette.secondary,
-        );
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: AppPalette.primary,
+      brightness: brightness,
+    ).copyWith(
+      primary: AppPalette.primary,
+      secondary: AppPalette.secondary,
+    );
 
     return ThemeData(
       useMaterial3: true,
@@ -138,12 +136,7 @@ class _AuthGateState extends State<_AuthGate> {
             body: Center(child: CircularProgressIndicator()),
           );
         }
-
-        if (snapshot.data == true) {
-          return const HomePage();
-        }
-
-        return const AuthScreen();
+        return snapshot.data == true ? const HomePage() : const AuthScreen();
       },
     );
   }
@@ -164,8 +157,7 @@ class _HomePageState extends State<HomePage> {
     Icons.home_rounded,
     Icons.folder_open_rounded,
     Icons.insights_rounded,
-    Icons.person_rounded,
-    Icons.settings_rounded,
+    Icons.tune_rounded,
   ];
 
   Widget _buildCurrentScreen() {
@@ -177,9 +169,7 @@ class _HomePageState extends State<HomePage> {
       case 2:
         return const ActivityScreen();
       case 3:
-        return const ProfileScreen();
-      case 4:
-        return const SettingsScreen();
+        return const OpcionesScreen();
       default:
         return const HomeDashboardScreen();
     }
@@ -189,8 +179,7 @@ class _HomePageState extends State<HomePage> {
         AppText.t(es: 'Inicio', en: 'Home'),
         AppText.t(es: 'Proyectos', en: 'Projects'),
         AppText.t(es: 'Actividad', en: 'Activity'),
-        AppText.t(es: 'Perfil', en: 'Profile'),
-        AppText.t(es: 'Ajustes', en: 'Settings'),
+        AppText.t(es: 'Opciones', en: 'Options'),
       ];
 
   @override
@@ -213,19 +202,22 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          AppText.t(es: 'GreenPulse', en: 'GreenPulse'),
-          style: const TextStyle(fontWeight: FontWeight.w700),
+        title: const Text(
+          'GreenPulse',
+          style: TextStyle(fontWeight: FontWeight.w700),
         ),
         actions: [
           IconButton(
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => const NotificationsScreen(),
-                ),
-              );
-            },
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const PlantasScreen()),
+            ),
+            icon: const Icon(Icons.yard_rounded),
+            tooltip: 'Catálogo de plantas',
+          ),
+          IconButton(
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+            ),
             icon: const Icon(Icons.notifications_none_rounded),
           ),
         ],
@@ -234,11 +226,8 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: NavigationBar(
         height: 70,
         selectedIndex: _selectedIndex,
-        onDestinationSelected: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
+        onDestinationSelected: (index) =>
+            setState(() => _selectedIndex = index),
         indicatorColor: AppPalette.navIndicatorOf(context),
         destinations: List.generate(
           _navLabels.length,

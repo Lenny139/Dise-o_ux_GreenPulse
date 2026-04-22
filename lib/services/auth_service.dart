@@ -23,18 +23,24 @@ class AuthService {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(TOKEN_KEY, token);
 
+      // Guardar usuario_id para filtrar proyectos por usuario
+      final usuarioId =
+          _toInt(data['usuario_id']) ??
+          _toInt((data['usuario'] as Map?)?['id']);
+      if (usuarioId != null) {
+        await prefs.setInt(USUARIO_ID_KEY, usuarioId);
+      }
+
       final usuario = data['usuario'];
       if (usuario is Map) {
-        final map = usuario.map(
-          (key, value) => MapEntry(key.toString(), value),
-        );
+        final map = usuario.map((k, v) => MapEntry(k.toString(), v));
         final nombre = map['nombre']?.toString();
-        final correo = map['correo']?.toString();
+        final correoGuardado = map['correo']?.toString();
         if (nombre != null && nombre.isNotEmpty) {
           await prefs.setString('usuario_nombre', nombre);
         }
-        if (correo != null && correo.isNotEmpty) {
-          await prefs.setString('usuario_correo', correo);
+        if (correoGuardado != null && correoGuardado.isNotEmpty) {
+          await prefs.setString('usuario_correo', correoGuardado);
         }
       }
 
@@ -54,7 +60,6 @@ class AuthService {
         '/auth/registro',
         data: {'nombre': nombre, 'correo': correo, 'contrasena': contrasena},
       );
-
       return _asMap(response.data);
     } on DioException catch (error) {
       throw Exception(ApiClient.readableError(error));
@@ -64,6 +69,9 @@ class AuthService {
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(TOKEN_KEY);
+    await prefs.remove(USUARIO_ID_KEY);
+    await prefs.remove('usuario_nombre');
+    await prefs.remove('usuario_correo');
   }
 
   Future<Map<String, dynamic>> getPerfil() async {
@@ -72,7 +80,7 @@ class AuthService {
       final data = _asMap(response.data);
       final usuario = data['usuario'];
       if (usuario is Map) {
-        final map = usuario.map((key, value) => MapEntry(key.toString(), value));
+        final map = usuario.map((k, v) => MapEntry(k.toString(), v));
         await _persistUserPrefs(map);
       }
       return data;
@@ -93,7 +101,7 @@ class AuthService {
       final data = _asMap(response.data);
       final usuario = data['usuario'];
       if (usuario is Map) {
-        final map = usuario.map((key, value) => MapEntry(key.toString(), value));
+        final map = usuario.map((k, v) => MapEntry(k.toString(), v));
         await _persistUserPrefs(map);
       }
       return data;
@@ -128,21 +136,18 @@ class AuthService {
   String? _extractToken(Map<String, dynamic> data) {
     final rootToken = data['token'] ?? data['access_token'] ?? data['jwt'];
     if (rootToken != null) return rootToken.toString();
-
     final nested = data['data'];
     if (nested is Map<String, dynamic>) {
-      final nestedToken =
-          nested['token'] ?? nested['access_token'] ?? nested['jwt'];
-      if (nestedToken != null) return nestedToken.toString();
+      final t = nested['token'] ?? nested['access_token'] ?? nested['jwt'];
+      if (t != null) return t.toString();
     }
-
     return null;
   }
 
   Map<String, dynamic> _asMap(dynamic value) {
     if (value is Map<String, dynamic>) return value;
     if (value is Map) {
-      return value.map((key, value) => MapEntry(key.toString(), value));
+      return value.map((k, v) => MapEntry(k.toString(), v));
     }
     throw Exception('Formato de respuesta inválido');
   }
@@ -151,12 +156,17 @@ class AuthService {
     final prefs = await SharedPreferences.getInstance();
     final nombre = userMap['nombre']?.toString();
     final correo = userMap['correo']?.toString();
-
     if (nombre != null && nombre.isNotEmpty) {
       await prefs.setString('usuario_nombre', nombre);
     }
     if (correo != null && correo.isNotEmpty) {
       await prefs.setString('usuario_correo', correo);
     }
+  }
+
+  int? _toInt(dynamic v) {
+    if (v == null) return null;
+    if (v is int) return v;
+    return int.tryParse(v.toString());
   }
 }

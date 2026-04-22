@@ -1,73 +1,133 @@
 import 'package:dio/dio.dart';
 
 import '../core/api_client.dart';
+import '../models/cultivo.dart';
 import '../models/registro_agronomico.dart';
+import '../backup/repositories/cultivos_repository.dart';
+import '../backup/repositories/registros_repository.dart';
 
 class CultivosService {
   final Dio _dio = ApiClient.instance.dio;
+  final _cultivosRepo = CultivosRepository.instance;
+  final _registrosRepo = RegistrosRepository.instance;
   int lastAlertasGeneradas = 0;
 
+  // ─── Cultivos ─────────────────────────────────────────────────────────────
+
+  Future<List<Cultivo>> getCultivos(int proyectoId) async {
+    try {
+      final response = await _dio.get('/proyectos/$proyectoId/cultivos');
+      final list = response.data;
+      if (list is! List) return const [];
+
+      final cultivos = list
+          .whereType<Map>()
+          .map((item) => Cultivo.fromJson(_asMap(item)))
+          .toList();
+
+      await _cultivosRepo.guardarCultivos(proyectoId, cultivos);
+      return cultivos;
+    } on DioException {
+      return _cultivosRepo.obtenerCultivos(proyectoId);
+    }
+  }
+
+  Future<Cultivo> crearCultivo(
+    int proyectoId, {
+    required int plantaId,
+    required String nombreLote,
+    double? areaM2,
+    int? cantidadPlantas,
+    String? variedad,
+  }) async {
+    try {
+      final data = <String, dynamic>{
+        'planta_id': plantaId,
+        'nombre_lote': nombreLote,
+      };
+      if (areaM2 != null) data['area_m2'] = areaM2;
+      if (cantidadPlantas != null) data['cantidad_plantas'] = cantidadPlantas;
+      if (variedad != null && variedad.isNotEmpty) data['variedad'] = variedad;
+
+      final response = await _dio.post(
+        '/proyectos/$proyectoId/cultivos',
+        data: data,
+      );
+      final cultivo = Cultivo.fromJson(_asMap(response.data));
+
+      // Refrescar cultivos del proyecto en local
+      final todos = await getCultivos(proyectoId);
+      await _cultivosRepo.guardarCultivos(proyectoId, todos);
+
+      return cultivo;
+    } on DioException catch (e) {
+      throw Exception(ApiClient.readableError(e));
+    }
+  }
+
+  Future<void> eliminarCultivo(int cultivoId) async {
+    try {
+      await _dio.delete('/cultivos/$cultivoId');
+      await _cultivosRepo.eliminarCultivo(cultivoId);
+    } on DioException catch (e) {
+      throw Exception(ApiClient.readableError(e));
+    }
+  }
+
+  // ─── Registros ────────────────────────────────────────────────────────────
+
   Future<List<RegistroAgronomico>> getRegistros(
-    int loteId, {
-    int page = 1,
+    int cultivoId, {
+    int skip = 0,
+    int limit = 20,
   }) async {
     try {
       final response = await _dio.get(
-        '/proyectos/$loteId/cultivos',
-        queryParameters: {'page': page},
+        '/cultivos/$cultivoId/registros',
+        queryParameters: {'skip': skip, 'limit': limit},
       );
+      final list = response.data;
+      if (list is! List) return const [];
 
-      final data = _asMap(response.data);
-      final rows = (data['registros'] is List)
-          ? (data['registros'] as List)
-          : (data['data'] is List)
-          ? (data['data'] as List)
-          : const [];
-
-      return rows
+      final registros = list
           .whereType<Map>()
-          .map((json) => RegistroAgronomico.fromJson(_asMap(json)))
-          .toList(growable: false);
-    } on DioException catch (error) {
-      throw Exception(ApiClient.readableError(error));
+          .map((item) => RegistroAgronomico.fromJson(_asMap(item)))
+          .toList();
+
+      await _registrosRepo.guardarRegistros(cultivoId, registros);
+      return registros;
+    } on DioException {
+      return _registrosRepo.obtenerRegistros(cultivoId);
     }
   }
 
   Future<RegistroAgronomico> crearRegistro(
-    int loteId,
+    int cultivoId,
     Map<String, dynamic> data,
   ) async {
     try {
       final response = await _dio.post(
-        '/proyectos/$loteId/cultivos',
+        '/cultivos/$cultivoId/registros',
         data: data,
       );
       final body = _asMap(response.data);
-      lastAlertasGeneradas = _toInt(body['alertas_generadas']) ?? 0;
+      lastAlertasGeneradas = (body['alertas_generadas'] as num?)?.toInt() ?? 0;
 
-      final payload = (body['registro'] is Map)
-          ? _asMap(body['registro'])
-          : (body['data'] is Map)
-          ? _asMap(body['data'])
-          : body;
+      final registroRaw =
+          body['registro'] is Map ? _asMap(body['registro']) : body;
+      final registro = RegistroAgronomico.fromJson(registroRaw);
 
-      return RegistroAgronomico.fromJson(payload);
-    } on DioException catch (error) {
-      throw Exception(ApiClient.readableError(error));
+      // Guardar en local
+      await _registrosRepo.guardarRegistro(cultivoId, registro);
+      return registro;
+    } on DioException catch (e) {
+      throw Exception(ApiClient.readableError(e));
     }
   }
 
-  Map<String, dynamic> _asMap(dynamic value) {
-    if (value is Map<String, dynamic>) return value;
-    if (value is Map) {
-      return value.map((key, value) => MapEntry(key.toString(), value));
-    }
+  Map<String, dynamic> _asMap(dynamic v) {
+    if (v is Map<String, dynamic>) return v;
+    if (v is Map) return v.map((k, val) => MapEntry(k.toString(), val));
     throw Exception('Formato de respuesta inválido');
-  }
-
-  int? _toInt(dynamic value) {
-    if (value == null) return null;
-    if (value is int) return value;
-    return int.tryParse(value.toString());
   }
 }

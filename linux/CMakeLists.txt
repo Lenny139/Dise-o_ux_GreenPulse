@@ -2,6 +2,12 @@
 cmake_minimum_required(VERSION 3.13)
 project(runner LANGUAGES CXX)
 
+# Linux desktop configuration is not supported on a native Windows host.
+if(WIN32)
+  message(STATUS "Skipping Linux desktop CMake configuration on Windows host.")
+  return()
+endif()
+
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
 set(BINARY_NAME "diseno_ux")
