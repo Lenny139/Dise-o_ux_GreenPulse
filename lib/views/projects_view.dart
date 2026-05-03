@@ -5,6 +5,7 @@ import '../core/app_text.dart';
 import '../models/proyecto.dart';
 import '../services/proyectos_service.dart';
 import 'project_detail_view.dart';
+import '../core/cultivo_iconos.dart';
 
 /// Tipos de proyecto disponibles en la app
 const _tiposProyecto = [
@@ -17,7 +18,7 @@ const _tiposProyecto = [
   'Terraza',
 ];
 
-String _iconoProyecto(String tipo) {
+String iconoProyecto(String tipo) {
   switch (tipo.toLowerCase()) {
     case 'invernadero':
       return '🏠';
@@ -113,7 +114,7 @@ class _ProjectsScreenState extends State<ProjectsScreen> {
                           value: t,
                           child: Row(
                             children: [
-                              Text(_iconoProyecto(t)),
+                              Text(iconoProyecto(t)),
                               const SizedBox(width: 8),
                               Text(t),
                             ],
@@ -321,7 +322,7 @@ class _ProyectoCard extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text(
-                    _iconoProyecto(proyecto.tipo),
+                    iconoProyecto(proyecto.tipo),
                     style: const TextStyle(fontSize: 26),
                   ),
                 ),
@@ -345,8 +346,7 @@ class _ProyectoCard extends StatelessWidget {
                       children: [
                         _Chip(label: proyecto.tipo),
                         _Chip(
-                          label:
-                              '${proyecto.totalCultivos} '
+                          label: '${proyecto.totalCultivos} '
                               '${proyecto.totalCultivos == 1 ? 'cultivo' : 'cultivos'}',
                           color: AppPalette.accent,
                         ),

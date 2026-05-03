@@ -6,8 +6,9 @@ import '../models/cultivo.dart';
 import '../models/proyecto.dart';
 import '../services/cultivos_service.dart';
 import '../services/plantas_service.dart';
+import '../core/cultivo_iconos.dart';
 
-String _iconoProyecto(String tipo) {
+String iconoProyecto(String tipo) {
   switch (tipo.toLowerCase()) {
     case 'invernadero':
       return '🏠';
@@ -26,7 +27,7 @@ String _iconoProyecto(String tipo) {
   }
 }
 
-String _iconoCultivo(String? nombre) {
+String iconoCultivo(String? nombre) {
   switch (nombre?.toLowerCase()) {
     case 'tomate':
       return '🍅';
@@ -152,7 +153,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                       (i) => DropdownMenuItem<int>(
                         value: i,
                         child: Text(
-                          '${_iconoCultivo(plantas[i].nombreComun)} ${plantas[i].nombreComun}',
+                          '${iconoCultivo(plantas[i].nombreComun)} ${plantas[i].nombreComun}',
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -290,7 +291,7 @@ class _ProjectDetailScreenState extends State<ProjectDetailScreen> {
                 child: Row(
                   children: [
                     Text(
-                      _iconoProyecto(p.tipo),
+                      iconoProyecto(p.tipo),
                       style: const TextStyle(fontSize: 36),
                     ),
                     const SizedBox(width: 14),
@@ -398,7 +399,7 @@ class _CultivoTile extends StatelessWidget {
           ),
           child: Center(
             child: Text(
-              _iconoCultivo(cultivo.plantaNombre),
+              iconoCultivo(cultivo.plantaNombre),
               style: TextStyle(
                 fontSize: 22,
                 color: activo ? null : Colors.grey,

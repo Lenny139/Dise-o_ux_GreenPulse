@@ -7,6 +7,7 @@ import '../models/proyecto.dart';
 import '../models/registro_agronomico.dart';
 import '../services/cultivos_service.dart';
 import '../services/proyectos_service.dart';
+import '../core/cultivo_iconos.dart';
 
 class ActivityScreen extends StatefulWidget {
   const ActivityScreen({super.key});
@@ -147,7 +148,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
                   backgroundColor: seleccionado
                       ? AppPalette.primary.withValues(alpha: 0.15)
                       : AppPalette.softSurfaceOf(ctx),
-                  child: Text(_iconoProyecto(p.tipo)),
+                  child: Text(iconoProyecto(p.tipo)),
                 ),
                 title: Text(p.nombre),
                 subtitle: Text(p.tipo),
@@ -209,7 +210,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
                   backgroundColor: sel
                       ? AppPalette.primary.withValues(alpha: 0.15)
                       : AppPalette.softSurfaceOf(ctx),
-                  child: Text(_iconoCultivo(c.plantaNombre)),
+                  child: Text(iconoCultivo(c.plantaNombre)),
                 ),
                 title: Text(c.displayName),
                 subtitle: Text(c.plantaNombre ?? ''),
@@ -470,7 +471,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
                 backgroundColor: AppPalette.softSurfaceOf(context),
                 child: Text(
                   _proyectoSeleccionado != null
-                      ? _iconoProyecto(_proyectoSeleccionado!.tipo)
+                      ? iconoProyecto(_proyectoSeleccionado!.tipo)
                       : '🌾',
                 ),
               ),
@@ -503,7 +504,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
                 backgroundColor: AppPalette.softSurfaceOf(context),
                 child: Text(
                   _cultivoSeleccionado != null
-                      ? _iconoCultivo(_cultivoSeleccionado!.plantaNombre)
+                      ? iconoCultivo(_cultivoSeleccionado!.plantaNombre)
                       : '🌱',
                 ),
               ),
@@ -653,60 +654,6 @@ class _ActivityScreenState extends State<ActivityScreen> {
         ],
       ],
     );
-  }
-}
-
-String _iconoProyecto(String tipo) {
-  switch (tipo.toLowerCase()) {
-    case 'invernadero':
-      return '🏠';
-    case 'huerto':
-      return '🌿';
-    case 'parcela':
-      return '🟫';
-    case 'vivero':
-      return '🌱';
-    case 'jardín urbano':
-      return '🏙️';
-    case 'terraza':
-      return '🏗️';
-    default:
-      return '🌾';
-  }
-}
-
-String _iconoCultivo(String? nombre) {
-  switch (nombre?.toLowerCase()) {
-    case 'tomate':
-      return '🍅';
-    case 'maíz':
-      return '🌽';
-    case 'café arábica':
-    case 'café robusta':
-      return '☕';
-    case 'arroz':
-      return '🌾';
-    case 'papa':
-      return '🥔';
-    case 'frijol':
-      return '🫘';
-    case 'aguacate':
-      return '🥑';
-    case 'banano':
-    case 'plátano':
-      return '🍌';
-    case 'lechuga':
-      return '🥬';
-    case 'zanahoria':
-      return '🥕';
-    case 'mango':
-      return '🥭';
-    case 'naranja':
-      return '🍊';
-    case 'cacao':
-      return '🍫';
-    default:
-      return '🌱';
   }
 }
 
